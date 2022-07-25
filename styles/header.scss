@@ -1,0 +1,58 @@
+header{
+    width: 100vw;
+    padding: 0 50px;
+    height: 10vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background-color: $dark-bg;
+
+    .logo{
+        font-size: 2em;
+        color: $white;
+    }
+
+    a{
+        display: flex;
+    
+
+        svg{
+            width: 20px;
+            fill: $white;
+            margin-right: 10px;
+        }
+    }
+
+    .profile{
+        display: flex;
+        direction: rtl;
+        align-items: center;
+
+        .info{
+            display: flex;
+            flex-direction: column;
+
+            p, small{
+                color: $white;
+            }
+            small{
+                font-size: .6em;
+            }
+
+
+        }
+        svg{
+            transform: rotateY(180deg);
+        }
+
+
+        img{
+            width: 50px;
+            height: auto;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+    }
+}
