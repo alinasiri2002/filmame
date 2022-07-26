@@ -97,8 +97,6 @@ function Room({roomdb}) {
 
 
               }
-
-
           }
           setSyncing(false);
       });
