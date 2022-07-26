@@ -1,36 +1,56 @@
-import { Server } from 'Socket.IO'
+import { Server } from 'socket.io'
 
-const SocketHandler = (req, res) => {
-  if (res.socket.server.io) {
+const SocketHandler =  (req, res) => {
+
+    if (res.socket.server.io) {
     // console.log('Socket is already running')
-  } else {
+    } else {
     // console.log('Socket is initializing')
     const io = new Server(res.socket.server)
     res.socket.server.io = io
+  
+    io.on('connection', (socket) => {
 
-    io.on('connection', socket => {
+      socket.on('join', async (room) => {
+          socket.join(room)
 
-      socket.on('join-room', room => {
-        socket.join(room)
-        // io.in(room).emit('playing', false)
-      })
-
-      socket.on('movieUrl', (room, url) => {
-        io.in(room).emit('movieUrl', url)
-
-      })
-      socket.on('subtitle', (room, url) => {
-        io.in(room).emit('subtitle', url)
-
-      })
-
-      socket.on('playing', (room, status, time, smovieUrl, ssubUrl) => {
-        io.in(room).emit('playing', status, time, smovieUrl, ssubUrl)
-      })
+          const clients = io.sockets.adapter.rooms.get(room)
+          if (clients.size > 1) {
+            const [client] = clients
+            socket.to(client).emit('new-user')
+          }
 
 
-    })
+      });
+  
+      socket.on('leave', (room) => {
+        socket.leave(room)
+      });
+    
+      socket.on('sync', (room, command, position) => {
+
+        if (command == 'play' || command == 'pause') {
+          io.to(room).emit('sync', command, position)
+        } 
+        
+        else if (command == 'seek') {
+          io.to(room).emit('sync', command, position)
+        } 
+        
+        else {
+          io.to(room).emit('sync', 'stop')
+        } 
+ 
+      });
+
+      socket.on('info', (room, data) => {
+        io.in(room).emit('info', data)
+      });
+
+    });
+    
   }
+
   res.end()
 }
 
