@@ -21,7 +21,7 @@ export default function Home() {
       time:"",
     }
 
-    fetch('http://localhost:3000/api/room', {
+    fetch('/api/room', {
       method: 'POST',
       headers: {
         'Accept': 'application/json, text/plain, */*',
