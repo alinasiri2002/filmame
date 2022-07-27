@@ -61,6 +61,7 @@ export default function Home() {
         <h1>A Better Way To Watch</h1>
         <p>Virtual movie night with your partner, friends, family, or colleagues?<br/>We've got you covered! Gather as many people as you like!</p>
 
+        {!user && <p className='login-alert'>Please Login To Continue</p> }
 
         <div className="home-btns">
           <button className='create btn' disabled={!user ? true : false} onClick={()=>{handelCreateRoom()}}>Create Room</button>
