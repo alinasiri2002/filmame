@@ -25,11 +25,65 @@
       line-height: 30px;
     }
 
-    .btn{
-      font-size: 1em;
-      min-width: 180px;
-      height: 40px;
+    .home-btns{
+      // width: 200px;
       margin-top: 10px;
+      flex-wrap: wrap;
+      position: relative;
+
+      display: flex;
+      text-align: center;
+      justify-content: space-between;
+      align-items: center;
+      color: $white;
+
+      .error{
+        position: absolute;
+        bottom: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 5px 10px;
+        color: $pr;
+        width: 100%;
+
+      }
+
+      .create{
+        font-size: 1em;
+        width: 180px;
+        height: 40px;
+        margin-top: 10px;
+      }
+
+
+
+      .join-sec{
+        margin-top: 10px;
+        width: 180px;
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+        input{
+          border: 2px solid $pr;
+          width: 120px;
+          background-color: #0c0e13;
+          color: rgb(200, 200, 200);
+          padding: 10px;
+          border-radius: 5px;
+        }
+        .join{
+          border: 2px solid $pr;
+          width: 50px;
+          color: white;
+          background-color: $pr;
+
+        }
+
+
+      }
+
     }
+
+
   }
 }

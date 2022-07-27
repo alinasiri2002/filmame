@@ -1,13 +1,17 @@
 import React, {useState, useEffect, useRef} from 'react'
-import { withPageAuthRequired } from '@auth0/nextjs-auth0';
-import {clientPromise} from "../../db/mongodb";
-import { ObjectId } from "bson"
+import {getSession, withPageAuthRequired } from '@auth0/nextjs-auth0';
+import { useRouter } from 'next/router'
+import { useUser } from '@auth0/nextjs-auth0';
+
 
 import io from 'socket.io-client'
 let socket
 
-function Room({roomdb}) {
-  const  {id : room} = roomdb
+function Room({user}) {
+
+  // const { user, isLoading } = useUser();
+  const router = useRouter()
+  const { id : room } = router.query
 
   const [syncing, setSyncing] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -23,6 +27,10 @@ function Room({roomdb}) {
   const [subUrl, setSubUrl] = useState()
   const [sub, setSub] = useState()
 
+
+  const [users, setUsers] = useState([user])
+  
+
   const loadSub = (url)=>{
       const convert = content => new Promise(converted => {
         content = content.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
@@ -37,10 +45,14 @@ function Room({roomdb}) {
       client.send()
   }
 
-
+  useEffect(() => { window.users = users },[users])
 
   useEffect( () => {
-      socketInitializer()
+   
+    socketInitializer()
+    return () => {
+      socket.disconnect()
+    };
   },[])
 
 
@@ -49,12 +61,8 @@ function Room({roomdb}) {
       socket = io()
 
       socket.on('connect', () => {
-          socket.emit('join', room);
+          socket.emit('join', room, user);
 
-      })
-
-      socket.on('disconnect', () => {
-          socket.emit('leave', room);
       })
 
       socket.on('sync', (command, position) => {
@@ -101,30 +109,34 @@ function Room({roomdb}) {
           setSyncing(false);
       });
 
-      socket.on('info', data => {
-          const {movieUrl : movieInfo, subUrl:subInfo, position:positionInfo, playing:playingInfo} = data
-          movieInfo && setMovieUrl(movieInfo)
-          if (subInfo) {
-              setSub(subInfo)
-              loadSub(subInfo)
-          }
-          if (playingInfo == true) {
-              setPlaying(playingInfo)
+      socket.on('info', (data, users) => {
+        const {movieUrl : movieInfo, subUrl:subInfo, position:positionInfo, playing:playingInfo} = data
+        movieInfo && setMovieUrl(movieInfo)
+        if (subInfo) {
+            setSub(subInfo)
+            loadSub(subInfo)
+        }
+        if (playingInfo == true) {
+            setPlaying(playingInfo)
 
-          }else{
-              setPlaying(playingInfo)
-          }
-          positionInfo && setPosition(positionInfo)
-              
-
-          
-
+        }else{
+            setPlaying(playingInfo)
+        }
+        positionInfo && setPosition(positionInfo)
+            
+        users && setUsers(users);
 
       });
 
-      socket.on('new-user', () => {
-          sendInfo(room, source.current?.src, track.current?.id, player.current?.currentTime, !player.current.paused)
+      socket.on('new-user', (user) => {
+          window.users = [...window.users ,user]
+          sendInfo(room, window.users, source.current?.src, track.current?.id, player.current?.currentTime, !player.current.paused)
       });
+
+      socket.on('left-user', (user) => {
+        const newUsers = users.filter(obj => obj != user)
+        setUsers(newUsers)
+    });
 
   }
 
@@ -152,19 +164,16 @@ function Room({roomdb}) {
   }
 
 
-  
-
-
-
-  const sendInfo = (room, movie, sub, time, isPlaying) => {
+  const sendInfo = (room, user, movie, sub, time, isPlaying) => {
       const data = {
           movieUrl : movie,
           subUrl : sub,
           position : time,
           playing : isPlaying,
       }
-      socket.emit('info', room, data)
+      socket.emit('info', room, data, user)
   }
+
 
 const handleMovieUrl = (e)=> {
   e.preventDefault()
@@ -172,8 +181,6 @@ const handleMovieUrl = (e)=> {
   sendInfo(room, url, null, 0, false)
   e.target.reset()
 }
-
-
 
 const handleSubUrl = (e)=>{
   e.preventDefault()
@@ -215,54 +222,42 @@ return (
     </div>
     </div>
 
-
-
-
+    <div className="users">
+      <h1>Room Members ({users?.length})</h1>
+      <div className="user-list">
+        {users?.map((user) => (
+          <div className="user-cart">
+            <img src={user?.picture}/>
+            <div className="user-detail">
+              <p className="name">{user?.name}</p>
+              <p className="email">{user?.email}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
 
   </main>
 )
 }
 
 
-
-
-
-
-
-
-
-
-export default withPageAuthRequired(Room, {
-  onRedirecting: () => <div>Loading...</div>,
-  // returnTo: '/',
-});
+export default Room
+// export default withPageAuthRequired(Room, {
+//   onRedirecting: () => <div>Loading...</div>,
+//   // returnTo: '/',
+// });
 
 export const getServerSideProps = withPageAuthRequired({
-  // returnTo: '/foo',
-  async getServerSideProps(context) {
-    const roomId = context.params.id
+  getServerSideProps: async ({ req, res }) => {
+    const auth0User = getSession(req, res);
 
-
-    try {
-      const oId = ObjectId(roomId)
-      const client = await clientPromise;
-      const db = client.db(process.env.MONGODB_DB);
-  
-      var roomdb = await db.collection("room").findOne({_id : oId});
-      roomdb = JSON.parse(JSON.stringify(roomdb));
-
-    } catch (error) {
-      roomdb = null
-    }
-
-    if (!roomdb) {
-      return {
-        notFound: true,
-      }
-    }
+    let user = auth0User.user 
 
     return {
-      props: { roomdb },
+      props: {
+        user: user,
+      },
     };
-  }
+  },
 });

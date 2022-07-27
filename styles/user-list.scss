@@ -1,0 +1,48 @@
+.users{
+    margin-top: 100px;
+    h1{
+        text-align: center;
+        color: $pr;
+
+    }
+
+    .user-list{
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 50px;
+    
+        .user-cart{
+            border: 1px solid $white;
+            border-radius: 5px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            img{
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                margin-right: 10px;
+                background-color: $white;
+            }
+            .user-detail{
+    
+                p{
+                    color: white;
+
+                }
+                .name{
+                    font-size: 1.5em;
+                    font-weight: bold;
+                }
+                .email{
+                    margin-top: 5px;
+                    font-size: .8em;
+
+                }
+    
+            }
+        }
+        
+    }
+}

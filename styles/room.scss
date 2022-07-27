@@ -1,13 +1,11 @@
 .room{
 
-    padding: 0 10vw;
+    padding: 50px 10vw;
 
 
     .player-wrapper{
         .form{
-
-            margin: 10px 0;
-            margin-bottom: 100px;
+            margin-top: 10px ;
             display: grid;
             gap: 1vw;
             justify-content: space-between;
@@ -65,10 +63,10 @@
 
 
     .alert{
-        color: $white;
+        color: $pr;
         width: 100%;
         text-align: center;
-        margin: 30px 0;
+        margin-bottom: 30px ;
     }
 
 }
