@@ -164,21 +164,21 @@ function Room({user}) {
   }
 
 
-  const sendInfo = (room, user, movie, sub, time, isPlaying) => {
+  const sendInfo = (room, users, movie, sub, time, isPlaying) => {
       const data = {
-          movieUrl : movie,
-          subUrl : sub,
-          position : time,
-          playing : isPlaying,
+        movieUrl : movie,
+        subUrl : sub,
+        position : time,
+        playing : isPlaying,
       }
-      socket.emit('info', room, data, user)
+      socket.emit('info', room, data, users)
   }
 
 
 const handleMovieUrl = (e)=> {
   e.preventDefault()
   const url = e.target.elements.mUrl.value
-  sendInfo(room, url, null, 0, false)
+  sendInfo(room,window.users, url, null, 0, false)
   e.target.reset()
 }
 
@@ -187,7 +187,7 @@ const handleSubUrl = (e)=>{
   const isSub = name => name.split(".").pop().toLowerCase() === "srt" || name.split(".").pop().toLowerCase() === "vtt";  
   const url = e.target.elements.sUrl.value
   if(true){
-      sendInfo(room, source.current?.src, url, player.current?.currentTime, !player.current?.pause)
+      sendInfo(room,window.users, source.current?.src, url, player.current?.currentTime, !player.current?.pause)
       e.target.reset()
   }
 

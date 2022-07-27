@@ -58,8 +58,9 @@ const SocketHandler =  (req, res) => {
  
       });
 
-      socket.on('info', (room, data, user) => {
-        io.in(room).emit('info', data, user)
+      socket.on('info', (room, data, users) => {
+        io.in(room).emit('info', data, users)
+
       });
 
     });
