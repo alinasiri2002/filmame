@@ -225,8 +225,8 @@ return (
     <div className="users">
       <h1>Room Members ({users?.length})</h1>
       <div className="user-list">
-        {users?.map((user) => (
-          <div className="user-cart">
+        {users?.map((user ,index) => (
+          <div key={index} className="user-cart">
             <img src={user?.picture}/>
             <div className="user-detail">
               <p className="name">{user?.name}</p>
