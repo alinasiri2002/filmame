@@ -21,7 +21,7 @@ function Room({user}) {
   const player = useRef();
   const source = useRef();
   const track = useRef();
-
+  const playerWindow = useRef();
 
   const [movieUrl, setMovieUrl] = useState()
   const [subUrl, setSubUrl] = useState()
@@ -51,6 +51,8 @@ function Room({user}) {
 
 
   useEffect( () => {
+
+
     socketInitializer()
     return () => {
       socket.disconnect()
@@ -229,9 +231,24 @@ function Room({user}) {
   }
 
 
+
   const fullsc = ()=>{
-    setFullscreen(!fullscreen)
+
+    if(document.fullscreenElement){
+      // removeEventListener('fullscreenchange', document)
+      setFullscreen(false)
+      document.exitFullscreen()
+
+    }else{
+      setFullscreen(true)
+      playerWindow.current.requestFullscreen()
+      document.addEventListener('fullscreenchange',(e) => {
+        !document.fullscreenElement && setFullscreen(false) && document.removeEventListener('fullscreenchange', document)
+      })
+    } 
   }
+
+
 
   const copyText = (txt) => {
     navigator.clipboard.writeText(txt)
@@ -241,10 +258,8 @@ function Room({user}) {
 
 
 
-
-
 return (
-  <main className="room">
+  <main className="room" ref={playerWindow}>
     <Head>
       <title>FilMaMe | Watch Party</title>
     </Head>
@@ -268,12 +283,15 @@ return (
 
     <div className="player-wrapper">
 
-      <div className={`player ${fullscreen && 'fullscreen'}`}>
+      <div  className={`player ${fullscreen && 'fullscreen'}`}>
       <video ref={player} key={movieUrl} id='video'  width="100%" height="auto" controls={!syncing} poster="/videoPoster.jpg" muted onPlay={onPlay} onPause={onPause} onSeeking={onSeeking} onLoadedData={onLoad}>
         <source ref={source}  key={movieUrl} src={movieUrl} type="video/mp4" />
         {subUrl && <track ref={track} key={subUrl} kind="subtitles" src={subUrl} id={sub}  srcLang=":)" label="sub"  default />}
       </video>
-      <div className='fullscreen-btn' onClick={()=>{fullsc()}}><svg width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 5h5V3H3v7h2zm5 14H5v-5H3v7h7zm11-5h-2v5h-5v2h7zm-2-4h2V3h-7v2h5z"/></svg></div>
+      <div className='fullscreen-btn' onClick={()=>{fullsc()}}>{fullscreen?<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 385.331 385.331"><path d="M264.943 156.665h108.273c6.833 0 11.934-5.39 11.934-12.211 0-6.833-5.101-11.85-11.934-11.838h-96.242V36.181c0-6.833-5.197-12.03-12.03-12.03s-12.03 5.197-12.03 12.03v108.273c0 .036.012.06.012.084 0 .036-.012.06-.012.096-.001 6.713 5.316 12.043 12.029 12.031zM120.291 24.247c-6.821 0-11.838 5.113-11.838 11.934v96.242H12.03c-6.833 0-12.03 5.197-12.03 12.03 0 6.833 5.197 12.03 12.03 12.03h108.273c.036 0 .06-.012.084-.012.036 0 .06.012.096.012 6.713 0 12.03-5.317 12.03-12.03V36.181c.001-6.821-5.389-11.922-12.222-11.934zM120.387 228.666H12.115c-6.833.012-11.934 5.39-11.934 12.223 0 6.833 5.101 11.85 11.934 11.838h96.242v96.423c0 6.833 5.197 12.03 12.03 12.03 6.833 0 12.03-5.197 12.03-12.03V240.877c0-.036-.012-.06-.012-.084 0-.036.012-.06.012-.096.001-6.714-5.317-12.031-12.03-12.031zM373.3 228.666H265.028c-.036 0-.06.012-.084.012-.036 0-.06-.012-.096-.012-6.713 0-12.03 5.317-12.03 12.03v108.273c0 6.833 5.39 11.922 12.223 11.934 6.821.012 11.838-5.101 11.838-11.922v-96.242H373.3c6.833 0 12.03-5.197 12.03-12.03s-5.196-12.031-12.03-12.043z"/></svg>:<svg width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 5h5V3H3v7h2zm5 14H5v-5H3v7h7zm11-5h-2v5h-5v2h7zm-2-4h2V3h-7v2h5z"/></svg>}</div>
+      
+      
+      
       <div className="emojies">
         <div className="emoji" onClick={()=>sendReact('😂')}>😂</div>
         <div className="emoji" onClick={()=>sendReact('😍')}>😍</div>

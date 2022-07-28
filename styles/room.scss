@@ -4,44 +4,35 @@
 
 
     .player-wrapper{
+        video{
+            // width: 100%;
+            height: 100%
+        }
 
         .player{
             position: relative;
             .fullscreen-btn{
-              position: absolute;
-              z-index: 2147483647;
-              width: 36px;
-              height: 36px;
-            //   border: 1px solid white;
-              bottom: 33.5px;
-              right: 54px;
-              background-color: transparent;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              border-radius: 50%;
+                position: absolute;
+                width: 36px;
+                height: 36px;
+                top: 5px;
+                right: 5px;
+                background-color: transparent;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
 
-
-              svg{
-                fill: white;
-                width: 15px;
-                height: 15px;
-                display: none;
-
-                path {
-                    stroke: #ffffff; /* Background color against your svg */
-                    stroke-width: .2px; /*Between 1px and 2px*/
-                  }
-              }
-
-              &:hover {
-                background-color: #1d1d1d;
 
                 svg{
-                    display: unset;
-
+                    fill: white;
+                    width: 20px;
+                    height: 20px;
                 }
-              }
+
+                &:hover {
+                    background-color: #1d1d1d;
+                }
             }
 
             .emojies{
@@ -68,27 +59,7 @@
                 }
             }
         }
-        .fullscreen{
-            overflow: hidden;
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
-            background: black;
-            top: 0;
-            left: 0;
-          z-index: 1000;
-          video{
-            margin-top: -10px;
-          }
-            .fullscreen-btn{
-              position: fixed;
-              bottom: 2.4%;
-              right: 3.6.5%;
-              
-            }
 
-
-        }
         .form{
             margin-top: 10px ;
             display: grid;
@@ -144,6 +115,16 @@
                 color: $pr;
             }
         }
+
+        .fullscreen{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            background-color: black;
+        }
     }
 
 
@@ -175,7 +156,7 @@
             padding: 3px 5px;
 
             .tooltip{
-                // display: none;
+                display: none;
                 opacity: 0;
                 position: absolute;
                 top: 0;
@@ -202,11 +183,11 @@
 
             }
             
-            &:hover .tooltip{
-                opacity: .8;
-                top: -35px;
+            // &:hover .tooltip{
+            //     opacity: .8;
+            //     top: -35px;
     
-            }
+            // }
 
         }
 

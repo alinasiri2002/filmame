@@ -18,7 +18,10 @@ body {
 
 }
 
-
+video::-webkit-media-controls-fullscreen-button
+{
+        display: none !important;
+}
 
 a {
   color: inherit;
