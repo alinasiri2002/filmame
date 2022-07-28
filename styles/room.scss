@@ -4,6 +4,91 @@
 
 
     .player-wrapper{
+
+        .player{
+            position: relative;
+            .fullscreen-btn{
+              position: absolute;
+              z-index: 2147483647;
+              width: 36px;
+              height: 36px;
+            //   border: 1px solid white;
+              bottom: 33.5px;
+              right: 54px;
+              background-color: transparent;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border-radius: 50%;
+
+
+              svg{
+                fill: white;
+                width: 15px;
+                height: 15px;
+                display: none;
+
+                path {
+                    stroke: #ffffff; /* Background color against your svg */
+                    stroke-width: .2px; /*Between 1px and 2px*/
+                  }
+              }
+
+              &:hover {
+                background-color: #1d1d1d;
+
+                svg{
+                    display: unset;
+
+                }
+              }
+            }
+
+            .emojies{
+                position: absolute;
+                left: 5px;
+                top: 1vw;
+                display: flex;
+                text-align: center;
+                vertical-align: middle;
+                line-height: 35px;
+                // display: grid;
+                // grid-template-columns: repeat(9, 1fr);
+                
+                .emoji{
+                    margin: 2px;
+                    width: 35px;
+                    height: 35px;
+                    background-color: rgba(255, 255, 255, 0.124);
+                    font-size: 1.2em;
+                    opacity: .7;
+                    border-radius: 50%;
+                    cursor: pointer;
+
+                }
+            }
+        }
+        .fullscreen{
+            overflow: hidden;
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            top: 0;
+            left: 0;
+          z-index: 1000;
+          video{
+            margin-top: -10px;
+          }
+            .fullscreen-btn{
+              position: fixed;
+              bottom: 2.4%;
+              right: 3.6.5%;
+              
+            }
+
+
+        }
         .form{
             margin-top: 10px ;
             display: grid;
@@ -62,11 +147,80 @@
     }
 
 
-    .alert{
-        color: $pr;
+    .react{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .icon{
+            font-size: 1.5em;
+            margin-left: 5px;
+        }
+    }
+
+    .share{
+        color: $white;
+        padding: 5px;
+        cursor:default;
         width: 100%;
-        text-align: center;
+        text-align: left;
         margin-bottom: 30px ;
+        font-weight: bold;
+        text-align: center;
+
+
+
+        .roomid{
+            position: relative;
+            padding: 3px 5px;
+
+            .tooltip{
+                // display: none;
+                opacity: 0;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: max-content;
+                transition: all .5s;
+                color: $white;
+                background-color: $pr;
+                padding: 7px 10px;
+                border-radius: 5px;
+                font-size: .8em;
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    margin-left: -5px;
+                    border-width: 5px;
+                    border-style: solid;
+                    border-color: $pr transparent transparent transparent;
+                }
+
+            }
+            
+            &:hover .tooltip{
+                opacity: .8;
+                top: -35px;
+    
+            }
+
+        }
+
+
+
+    }
+
+    footer{
+        width: 100vw;
+        background-color: $pr;
+        color: $dark-bg;
+        text-align: center;
+        padding: 5px 0;
+        transform: translate(-10vw, 50px);
     }
 
 }

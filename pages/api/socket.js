@@ -11,27 +11,33 @@ const SocketHandler =  (req, res) => {
   
     io.on('connection', (socket) => {
 
-      socket.on('join', async (room, user) => {
+      socket.on('join-room', async (room, user) => {
         socket.join(room)
         socket.user = user;
         socket.room = room;
 
-        const clients = io.sockets.adapter.rooms.get(room)
-        console.log();
-        if (clients.size > 1) {
-          const [client] = clients
-          socket.to(client).emit('new-user', user)
+        const theRoom = io.sockets.adapter.rooms.get(room)
+        if (theRoom.size == 1) {
+          theRoom.members = []
         }
+        else if (theRoom.size > 1) {
+          const [firstClient] = theRoom
+          socket.to(firstClient).emit('info-for-new-user', user)
+
+        }
+        theRoom.members.push(user)
+        io.to(room).emit('join-user', theRoom.members, user)
+
       });
 
-      socket.on('disconnect', ()=>{
+      socket.on('disconnecting', ()=>{
+        const theRoom = io.sockets.adapter.rooms.get(socket.room)
+        theRoom.members = theRoom?.members.filter(obj => obj.socketId != socket.id)
         socket.leave(socket.room)
-        io.to(socket.room).emit('left-user', socket.user)
+        io.to(socket.room).emit('left-user',theRoom.members,  socket.user)
 
       });
 
-
-  
 
 
       socket.on('check-room', (id, action) => {
@@ -42,25 +48,37 @@ const SocketHandler =  (req, res) => {
         }
       });
     
-      socket.on('sync', (room, command, position) => {
+
+      socket.on('sync', (room, user, command, position, ) => {
 
         if (command == 'play' || command == 'pause') {
-          io.to(room).emit('sync', command, position)
+          io.to(room).emit('sync', user, command, position)
         } 
         
         else if (command == 'seek') {
-          io.to(room).emit('sync', command, position)
+          io.to(room).emit('sync', user, command, position)
         } 
         
         else {
           io.to(room).emit('sync', 'stop')
         } 
- 
       });
 
-      socket.on('info', (room, data, users) => {
-        io.in(room).emit('info', data, users)
 
+      socket.on('info-to-all', (reciver, data, action, user ) => {
+        io.to(reciver).emit('info', data, null, action, user)
+      });
+
+
+      socket.on('info-to-new-user', (reciver, data ) => {
+        const theRoom = io.sockets.adapter.rooms.get(socket.room)
+        socket.to(reciver.socketId).emit('info', data, theRoom.members)
+
+      });
+
+
+      socket.on('react', (room, user, icon ) => {
+        io.to(room).emit('react', user, icon)
       });
 
     });

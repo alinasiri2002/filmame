@@ -9,7 +9,7 @@ function Header() {
   return (
     <header>
         <Link href="/">
-            <a className='logo'>FilMaMe</a>
+            <a className='logo'><span className='pr'>F</span>il<span className='pr'>M</span>a<span className='pr'>M</span>e</a>
         </Link>
 
         {!isLoading &&

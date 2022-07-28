@@ -56,6 +56,9 @@ export default function Home() {
 
   return (
     <main className="home">
+        <Head>
+        <title>FilMaMe</title>
+      </Head>
 
       <div className="info">
         <h1>A Better Way To Watch</h1>
