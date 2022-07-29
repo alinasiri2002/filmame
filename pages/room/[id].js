@@ -135,31 +135,42 @@ function Room({user}) {
 
       socket.on('info', (data, members, action, user) => {
         const {movieUrl : movieInfo, subUrl:subInfo, position:positionInfo, playing:playingInfo} = data
-        movieInfo != source.current?.src && setMovieUrl(movieInfo)
 
-        
-        if (playingInfo == true) {
-            setPlaying(true)
-
-        }else{
-            setPlaying(false)
-        }
-        setPosition (positionInfo)
-
-        if (subInfo && subInfo != track.current?.id){
-          setSub(subInfo)
-          loadSub(subInfo)
-        }else{
-          setSub(null)
-          loadSub(null)
-        }
-        members && setUsers(members);
 
         if (action == 'media'){
           movieInfo ? toast(`${user?.name || user?.email} Loaded New Media`) : toast(`${user?.name || user?.email} Removed The Media`) 
+          movieInfo != source.current?.src && setMovieUrl(movieInfo)
+
         }
         else if (action == 'subtitle'){
           subInfo ? toast(`${user?.name || user?.email} Loaded New Subtitle`) : toast(`${user?.name || user?.email} Removed The Subtitle`) 
+          if (subInfo && subInfo != track.current?.id){
+            setSub(subInfo)
+            loadSub(subInfo)
+          }else{
+            setSub(null)
+            loadSub(null)
+          }
+        }
+        else
+        {
+          movieInfo != source.current?.src && setMovieUrl(movieInfo)
+
+          if (playingInfo == true) {
+              setPlaying(true)
+  
+          }else{
+              setPlaying(false)
+          }
+          setPosition (positionInfo)
+          if (subInfo && subInfo != track.current?.id){
+            setSub(subInfo)
+            loadSub(subInfo)
+          }else{
+            setSub(null)
+            loadSub(null)
+          }
+          members && setUsers(members);
         }
 
       });
@@ -268,7 +279,7 @@ function Room({user}) {
       reader.onload = function(){
         var text = reader.result;
           convert(text).then(file => {
-            sendInfo(room, 'all', source.current?.src, file, player.current?.currentTime, !player.current?.pause, 'subtitle')
+            sendInfo(room, 'all', source.current?.src, file, player.current?.currentTime, player.current?.pause ? false : true, 'subtitle')
         })
       };
       reader.readAsText(file);
