@@ -49,27 +49,27 @@ button[disabled]{
 }
 
 form{
-  input{
+  input, label{
       border:none;
       background-color: #0c0e13;
       color: rgb(200, 200, 200);
+      color: #757575;
   }
 
   ::-webkit-file-upload-button {
-    background: #0c0e13;
-    color: transparent;
-    padding: 7px;
-    margin: 0;
-    border:none;
+    display: none;
 
-}
+  }
 
   input[type="submit"]{
       cursor: pointer;
   }
+
+
+
 }
 
-button{
+button, label{
   cursor: pointer;
 }
 

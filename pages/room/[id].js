@@ -35,18 +35,34 @@ function Room({user}) {
 
 
 
-  const loadSub = (url)=>{
-      const convert = content => new Promise(converted => {
-        content = content.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
-        content = "WEBVTT \n\n" + content;
-        converted(URL.createObjectURL(new Blob([content], {type: "text/vtt;charset=utf-8"})));
-      });
-      const client = new XMLHttpRequest()
-      client.open("GET", url);
-      client.onreadystatechange = () => {
-          convert(client.responseText).then(url => setSubUrl(url))
+  const loadSub = (file)=>{
+      // const convert = content => new Promise(converted => {
+      //   content = content.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
+      //   content = "WEBVTT \n\n" + content;
+      //   converted(URL.createObjectURL(new Blob([content], {type: "text/vtt;charset=utf-8"})));
+      // });
+      // // const client = new XMLHttpRequest()
+      // // client.open("GET", url);
+      // // client.onreadystatechange = () => {
+      // //     convert(client.responseText).then(url => setSubUrl(url))
+      // // }
+      // // client.send()
+      // const reader = new FileReader();
+      // reader.onload = function(){
+      //   var text = reader.result;
+      //     convert(text).then(url => setSubUrl(url))
+
+      // };
+      // reader.readAsText(url);
+      if (file) {
+
+        // setSub(file)
+
       }
-      client.send()
+      const url = URL.createObjectURL(new Blob([file], {type: "text/vtt;charset=utf-8"}))
+
+      setSubUrl(url)
+
   }
 
 
@@ -119,24 +135,31 @@ function Room({user}) {
 
       socket.on('info', (data, members, action, user) => {
         const {movieUrl : movieInfo, subUrl:subInfo, position:positionInfo, playing:playingInfo} = data
-        setMovieUrl(movieInfo)
-        setSub(subInfo)
-        loadSub(subInfo)
+        movieInfo != source.current?.src && setMovieUrl(movieInfo)
+
         
         if (playingInfo == true) {
-            setPlaying(playingInfo)
+            setPlaying(true)
 
         }else{
-            setPlaying(playingInfo)
+            setPlaying(false)
         }
         setPosition (positionInfo)
+
+        if (subInfo && subInfo != track.current?.id){
+          setSub(subInfo)
+          loadSub(subInfo)
+        }else{
+          setSub(null)
+          loadSub(null)
+        }
         members && setUsers(members);
 
         if (action == 'media'){
           movieInfo ? toast(`${user?.name || user?.email} Loaded New Media`) : toast(`${user?.name || user?.email} Removed The Media`) 
         }
         else if (action == 'subtitle'){
-          movieInfo ? toast(`${user?.name || user?.email} Loaded New Subtitle`) : toast(`${user?.name || user?.email} Removed The Subtitle`) 
+          subInfo ? toast(`${user?.name || user?.email} Loaded New Subtitle`) : toast(`${user?.name || user?.email} Removed The Subtitle`) 
         }
 
       });
@@ -171,23 +194,25 @@ function Room({user}) {
 
 
   const onPlay = (e) => {
-      !syncing && !playing && !player.current.seeking && socket.emit('sync',room , user, 'play', player.current.currentTime);
+    !playing && !player.current.seeking && socket.emit('sync',room , user, 'play', player.current.currentTime)
   };
 
   const onPause = (e) => {
-      !syncing && playing && !player.current.seeking && socket.emit('sync', room, user, 'pause', player.current.currentTime);
+    playing && !player.current.seeking && socket.emit('sync', room, user, 'pause', player.current.currentTime)
   };
 
   const onSeeking = (e) => {
-      !syncing  && (player.current.readyState == 1 )&& (position != player.current.currentTime)  && socket.emit('sync', room, user ,'seek', player.current.currentTime);
+    (player.current.readyState == 1 )&& (position != player.current.currentTime)  && socket.emit('sync', room, user ,'seek', player.current.currentTime);
 
   };
 
   const onLoad = (e) => {
       if(player.current && position != player.current.currentTime ) {player.current.currentTime = position}
       playing && player.current.play()
-      sub && loadSub(sub)
-
+      if (sub && sub != track.current.id){
+        setSub(sub)
+        loadSub(sub)
+      }
   }
 
 
@@ -215,13 +240,39 @@ function Room({user}) {
     e.target.reset()
   }
 
+  // const handleSubUrl = (e)=>{
+  //   e.preventDefault()
+  //   const isSub = name => name.split(".").pop().toLowerCase() === "srt" || name.split(".").pop().toLowerCase() === "vtt";  
+  //   // const url = e.target.elements.sUrl.value
+  //   const file = e.target.files[0]
+  //   const fileBlob = new Blob([file], {type: "text/vtt;charset=utf-8"})
+  //   if(true){
+  //       // sendInfo(room, 'all', source.current?.src, url, player.current?.currentTime, !player.current?.pause, 'subtitle')
+  //       sendInfo(room, 'all', source.current?.src, fileBlob, player.current?.currentTime, !player.current?.pause, 'subtitle')
+
+  //       // e.target.reset()
+  //   }
+  // }
+
   const handleSubUrl = (e)=>{
     e.preventDefault()
     const isSub = name => name.split(".").pop().toLowerCase() === "srt" || name.split(".").pop().toLowerCase() === "vtt";  
-    const url = e.target.elements.sUrl.value
-    if(true){
-        sendInfo(room, 'all', source.current?.src, url, player.current?.currentTime, !player.current?.pause, 'subtitle')
-        e.target.reset()
+    const file = e.target.files[0]
+    if(file && isSub(file.name)){
+        const convert = content => new Promise(converted => {
+        content = content.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
+        content = "WEBVTT \n\n" + content;
+        converted(content);
+      });
+      const reader = new FileReader();
+      reader.onload = function(){
+        var text = reader.result;
+          convert(text).then(file => {
+            sendInfo(room, 'all', source.current?.src, file, player.current?.currentTime, !player.current?.pause, 'subtitle')
+        })
+      };
+      reader.readAsText(file);
+        
     }
   }
 
@@ -313,11 +364,12 @@ return (
             <input id='mUrl' type="text" placeholder='video url' />
             <input type="submit" value="open"/>
         </form>
-
-        <form className="movie-form" onSubmit={handleSubUrl}>
-              {/* <input id='sub' type="file" text="upload" onChange={handleSubUrl} multiple={false} name="theFiles" /> */}
-              <input id='sUrl' type="text" placeholder='subtitle url' />
-              <input type="submit" value="open"/>
+{/* onSubmit={handleSubUrl} */}
+        <form className="movie-form" >
+              <input id='sUrl' type="file" text="upload" title=" sdbk " onChange={handleSubUrl} multiple={false} name="theFiles" />
+              {/* <input id='sUrl' type="text" placeholder='subtitle url' /> */}
+              <label htmlFor="sUrl">Subtitle</label>
+              {/* <input type="button" value="open" onClick={document.getElementById('sUrl').click}/> */}
         </form>
     </div>
     </div>

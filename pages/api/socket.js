@@ -32,9 +32,11 @@ const SocketHandler =  (req, res) => {
 
       socket.on('disconnecting', ()=>{
         const theRoom = io.sockets.adapter.rooms.get(socket.room)
-        theRoom.members = theRoom?.members.filter(obj => obj.socketId != socket.id)
+        if (theRoom) {
+          theRoom.members = theRoom?.members.filter(obj => obj.socketId != socket.id)
+          io.to(socket.room).emit('left-user',theRoom.members,  socket.user)
+        }
         socket.leave(socket.room)
-        io.to(socket.room).emit('left-user',theRoom.members,  socket.user)
 
       });
 
