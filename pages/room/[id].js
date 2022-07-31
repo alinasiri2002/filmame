@@ -140,6 +140,7 @@ function Room({user}) {
         if (action == 'media'){
           movieInfo ? toast(`${user?.name || user?.email} Loaded New Media`) : toast(`${user?.name || user?.email} Removed The Media`) 
           movieInfo != source.current?.src && setMovieUrl(movieInfo)
+          setPosition (positionInfo)
 
         }
         else if (action == 'subtitle'){
@@ -224,8 +225,8 @@ function Room({user}) {
         setSub(sub)
         loadSub(sub)
       }
-  }
 
+  }
 
   const sendInfo = (reciver, to, movie, sub, time, isPlaying, action) => {
       const data = {
