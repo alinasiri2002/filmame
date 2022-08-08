@@ -140,7 +140,8 @@ function Room({user}) {
         if (action == 'media'){
           movieInfo ? toast(`${user?.name || user?.email} Loaded New Media`) : toast(`${user?.name || user?.email} Removed The Media`) 
           movieInfo != source.current?.src && setMovieUrl(movieInfo)
-          setPosition (positionInfo)
+          setPosition (0)
+          setPlaying(false)
 
         }
         else if (action == 'subtitle'){
