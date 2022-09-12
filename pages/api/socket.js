@@ -83,6 +83,10 @@ const SocketHandler =  (req, res) => {
         io.to(room).emit('react', user, icon)
       });
 
+      socket.on('chat', (room, user, msg ) => {
+        io.to(room).emit('chat', user, msg)
+      });
+
     });
     
   }
